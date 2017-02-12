@@ -36,4 +36,4 @@ $smartcrop->output();
 
 The performance of smartcrop.php on PHP5 is far lower than on PHP7.
 
-If you want to for smartcrop on real time online image processing, php-smartcrop-extension(https://github.com/xymak/php-smartcrop-extension) is a better choice for its high performance.
+If you want to for smartcrop on real time online image processing, [php-smartcrop-extension](https://github.com/xymak/php-smartcrop-extension) is a better choice for its high performance.
