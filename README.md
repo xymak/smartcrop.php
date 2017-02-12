@@ -1,4 +1,4 @@
-# php-smartcrop-extension
+# smartcrop.php
 
 smartcrop implementation in PHP.
 
