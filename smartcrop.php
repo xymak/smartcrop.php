@@ -38,7 +38,7 @@ class smartcrop {
 			'prescale' => true,
 			'imageOperations' => null,
 			'canvasFactory' => 'defaultCanvasFactory',
-			'debug' => true 
+			'debug' => false 
 	];
 	public $options = [ ];
 	public $inputImage;
@@ -73,7 +73,9 @@ class smartcrop {
 	 * @return \xymak\image\smartcrop
 	 */
 	public function canvasImageOpen($image) {
-		$this->oImg = imagecreatefromstring ( file_get_contents ( $image ) );
+		$this->oImg = new \Imagick();
+		$image=file_get_contents ( $image );
+		$this->oImg->readimageblob($image);
 		return $this;
 	}
 	/**
@@ -82,8 +84,8 @@ class smartcrop {
 	 * @return \xymak\image\smartcrop
 	 */
 	public function canvasImageScale() {
-		$imageOriginalWidth = imagesx ( $this->oImg );
-		$imageOriginalHeight = imagesy ( $this->oImg );
+		$imageOriginalWidth = $this->oImg->getImageWidth();
+		$imageOriginalHeight = $this->oImg->getImageHeight();
 		$scale = min ( $imageOriginalWidth / $this->options ['width'], $imageOriginalHeight / $this->options ['height'] );
 		
 		$this->options ['cropWidth'] = ceil ( $this->options ['width'] * $scale );
@@ -112,9 +114,7 @@ class smartcrop {
 	 * @return \xymak\image\smartcrop
 	 */
 	public function canvasImageResample($width, $height) {
-		$oCanvas = imagecreatetruecolor ( $width, $height );
-		imagecopyresampled ( $oCanvas, $this->oImg, 0, 0, 0, 0, $width, $height, imagesx ( $this->oImg ), imagesy ( $this->oImg ) );
-		$this->oImg = $oCanvas;
+		$this->oImg->resizeImage($width, $height, \imagick::FILTER_UNDEFINED,1);
 		return $this;
 	}
 	/**
@@ -124,8 +124,8 @@ class smartcrop {
 	 */
 	public function analyse() {
 		$result = [ ];
-		$w = $this->w = imagesx ( $this->oImg );
-		$h = $this->h = imagesy ( $this->oImg );
+		$w = $this->w = $this->oImg->getImageWidth ();
+		$h = $this->h = $this->oImg->getImageHeight ();
 		
 		$this->od = new \SplFixedArray ( $h * $w * 3 );
 		$this->aSample = new \SplFixedArray ( $h * $w );
@@ -274,8 +274,8 @@ class smartcrop {
 	 * @return array
 	 */
 	public function generateCrops() {
-		$w = imagesx ( $this->oImg );
-		$h = imagesy ( $this->oImg );
+		$w = $this->oImg->getImageWidth ();
+		$h = $this->oImg->getImageHeight ();
 		$results = [ ];
 		$minDimension = min ( $w, $h );
 		$cropWidth = empty ( $this->options ['cropWidth'] ) ? $minDimension : $this->options ['cropWidth'];
@@ -385,12 +385,8 @@ class smartcrop {
 	 * @return float
 	 */
 	public function getRgbColorAt($x, $y) {
-		$rgb = imagecolorat ( $this->oImg, $x, $y );
-		return [ 
-				$rgb >> 16,
-				$rgb >> 8 & 255,
-				$rgb & 255 
-		];
+		$rgb = $this->oImg->getImagePixelColor($x, $y )->getColor();
+		return $rgb;
 	}
 	/**
 	 * @param integer $r
@@ -445,9 +441,7 @@ class smartcrop {
 	 * @return \xymak\image\smartcrop
 	 */
 	public function crop($x, $y, $width, $height) {
-		$oCanvas = imagecreatetruecolor ( $width, $height );
-		imagecopyresampled ( $oCanvas, $this->oImg, 0, 0, $x, $y, $width, $height, $width, $height );
-		$this->oImg = $oCanvas;
+        $this->oImg->cropimage($width, $height, $x, $y);
 		return $this;
 	}
 	/**
@@ -455,6 +449,6 @@ class smartcrop {
 	 */
 	public function output() {
 		header ( "Content-Type: image/jpeg" );
-		imagejpeg ( $this->oImg );
+		echo $this->oImg->getImageBlob();
 	}
 }
