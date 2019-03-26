@@ -457,11 +457,11 @@ class smartcrop {
 		$d = ($maximum - $minimum);
 		
 		if ($l > 0.5) {
-		    if ((2 - $maximum - $minimum) === 0) {
+		    if ((2 - $maximum - $minimum) == 0) {
 			RETURN 0;
 		    }
 		} else {
-		    if (($maximum + $minimum) === 0) {
+		    if (($maximum + $minimum) == 0) {
 			RETURN 0;
 		    }
 		}
