@@ -38,7 +38,7 @@ class smartcrop {
 			'prescale' => true,
 			'imageOperations' => null,
 			'canvasFactory' => 'defaultCanvasFactory',
-			'debug' => true 
+			'debug' => false, 
 	];
 	public $options = [ ];
 	public $inputImage;
@@ -73,7 +73,16 @@ class smartcrop {
 	 * @return \xymak\image\smartcrop
 	 */
 	public function canvasImageOpen($image) {
-		$this->oImg = imagecreatefromstring ( file_get_contents ( $image ) );
+		if(empty($image)){
+            		return false;
+        	}
+		
+		if(!is_string($image) && get_resource_type($image) === 'gd'){
+            		$this->oImg = $image;
+        	}
+		else {
+		    $this->oImg = imagecreatefromstring ( file_get_contents ( $image ) );
+		}
 		return $this;
 	}
 	/**
@@ -84,10 +93,20 @@ class smartcrop {
 	public function canvasImageScale() {
 		$imageOriginalWidth = imagesx ( $this->oImg );
 		$imageOriginalHeight = imagesy ( $this->oImg );
+		
+		if ($this->options ['debug']) {
+			if ( $imageOriginalWidth >= $this->options ['width'] ) {
+				die('smartcrop: your set image width is greater than the original image width.');
+			}
+	 		if ( $imageOriginalHeight >= $this->options ['height'] ) {
+        			die('smartcrop: your set image height is greater than the original image height.');
+			}
+		}
+		
 		$scale = min ( $imageOriginalWidth / $this->options ['width'], $imageOriginalHeight / $this->options ['height'] );
 		
-		$this->options ['cropWidth'] = ceil ( $this->options ['width'] * $scale );
-		$this->options ['cropHeight'] = ceil ( $this->options ['height'] * $scale );
+		$this->options ['cropWidth'] = floor ( $this->options ['width'] * $scale );
+		$this->options ['cropHeight'] = floor ( $this->options ['height'] * $scale );
 		
 		$this->options ['minScale'] = min ( $this->options ['maxScale'], max ( 1 / $scale, $this->options ['minScale'] ) );
 		
@@ -113,6 +132,10 @@ class smartcrop {
 	 */
 	public function canvasImageResample($width, $height) {
 		$oCanvas = imagecreatetruecolor ( $width, $height );
+		
+        	imagealphablending($oCanvas, false);
+        	imagesavealpha($oCanvas, true);
+		
 		imagecopyresampled ( $oCanvas, $this->oImg, 0, 0, 0, 0, $width, $height, imagesx ( $this->oImg ), imagesy ( $this->oImg ) );
 		$this->oImg = $oCanvas;
 		return $this;
@@ -424,16 +447,26 @@ class smartcrop {
 	 */
 	public function saturation($r, $g, $b) {
 		$maximum = max ( $r / 255, $g / 255, $b / 255 );
-		$minumum = min ( $r / 255, $g / 255, $b / 255 );
+		$minimum = min ( $r / 255, $g / 255, $b / 255 );
 		
-		if ($maximum === $minumum) {
+		if ($maximum === $minimum) {
 			return 0;
 		}
 		
-		$l = ($maximum + $minumum) / 2;
-		$d = ($maximum - $minumum);
+		$l = ($maximum + $minimum) / 2;
+		$d = ($maximum - $minimum);
 		
-		return $l > 0.5 ? $d / (2 - $maximum - $minumum) : $d / ($maximum + $minumum);
+		if ($l > 0.5) {
+		    if ((2 - $maximum - $minimum) === 0) {
+			RETURN 0;
+		    }
+		} else {
+		    if (($maximum + $minimum) === 0) {
+			RETURN 0;
+		    }
+		}
+		
+		return $l > 0.5 ? $d / (2 - $maximum - $minimum) : $d / ($maximum + $minimum);
 	}
 	/**
 	 * Crop image
@@ -446,6 +479,10 @@ class smartcrop {
 	 */
 	public function crop($x, $y, $width, $height) {
 		$oCanvas = imagecreatetruecolor ( $width, $height );
+		
+        	imagealphablending($oCanvas, false);
+        	imagesavealpha($oCanvas, true);
+		
 		imagecopyresampled ( $oCanvas, $this->oImg, 0, 0, $x, $y, $width, $height, $width, $height );
 		$this->oImg = $oCanvas;
 		return $this;
@@ -454,7 +491,25 @@ class smartcrop {
 	 * Output a image
 	 */
 	public function output() {
-		header ( "Content-Type: image/jpeg" );
-		imagejpeg ( $this->oImg );
+		$image_mime = image_type_to_mime_type(exif_imagetype($this->inputImage));
+		
+		if ($image_mime === 'image/jpeg') {
+		    header("Content-Type: image/jpeg");
+		    imagejpeg($this->oImg);
+		}
+		elseif ($image_mime === 'image/png') {
+		    header("Content-Type: image/png");
+		    imagepng($this->oImg);
+		}
+		elseif ($image_mime === 'image/gif') {
+		    header("Content-Type: image/gif");
+		    imagegif($this->oImg);
+		}
+	}
+	/**
+	 * Get canvas
+	 */
+	public function get() {
+		RETURN $this->oImg;
 	}
 }
