@@ -488,22 +488,24 @@ class smartcrop {
 		return $this;
 	}
 	/**
-	 * Output a image
+	 * Output an image to standard output or to a file
+	 *
+	 * @param string $filename
 	 */
-	public function output() {
+	public function output($filename = null) {
 		$image_mime = image_type_to_mime_type(exif_imagetype($this->inputImage));
 		
 		if ($image_mime === 'image/jpeg') {
 		    header("Content-Type: image/jpeg");
-		    imagejpeg($this->oImg);
+		    imagejpeg($this->oImg, $filename);
 		}
 		elseif ($image_mime === 'image/png') {
 		    header("Content-Type: image/png");
-		    imagepng($this->oImg);
+		    imagepng($this->oImg, $filename);
 		}
 		elseif ($image_mime === 'image/gif') {
 		    header("Content-Type: image/gif");
-		    imagegif($this->oImg);
+		    imagegif($this->oImg, $filename);
 		}
 	}
 	/**
