@@ -119,8 +119,8 @@ class Smartcrop
         $this->options ['minScale'] = min($this->options ['maxScale'], max(1 / $scale, $this->options ['minScale']));
 
         if ($this->options ['prescale'] !== false) {
-            $this->preScale = 1 / $scale / $this->options ['minScale'];
-            if ($this->preScale < 1) {
+            $this->prescale = 1 / $scale / $this->options ['minScale'];
+            if ($this->prescale < 1) {
                 $this->canvasImageResample(ceil($imageOriginalWidth * $this->preScale), ceil($imageOriginalHeight * $this->preScale));
                 $this->options ['cropWidth']  = ceil($this->options ['cropWidth'] * $this->preScale);
                 $this->options ['cropHeight'] = ceil($this->options ['cropHeight'] * $this->preScale);
