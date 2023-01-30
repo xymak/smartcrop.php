@@ -121,11 +121,11 @@ class Smartcrop
         if ($this->options ['prescale'] !== false) {
             $this->prescale = 1 / $scale / $this->options ['minScale'];
             if ($this->prescale < 1) {
-                $this->canvasImageResample(ceil($imageOriginalWidth * $this->preScale), ceil($imageOriginalHeight * $this->preScale));
-                $this->options ['cropWidth']  = ceil($this->options ['cropWidth'] * $this->preScale);
-                $this->options ['cropHeight'] = ceil($this->options ['cropHeight'] * $this->preScale);
+                $this->canvasImageResample(ceil($imageOriginalWidth * $this->prescale), ceil($imageOriginalHeight * $this->prescale));
+                $this->options ['cropWidth']  = ceil($this->options ['cropWidth'] * $this->prescale);
+                $this->options ['cropHeight'] = ceil($this->options ['cropHeight'] * $this->prescale);
             } else {
-                $this->preScale = 1;
+                $this->prescale = 1;
             }
         }
 
