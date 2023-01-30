@@ -1,10 +1,10 @@
 <?php
 
-namespace xymak\image;
+namespace Nickdekh\SmartcropPhp;
 
 use SplFixedArray;
 
-class smartcrop
+class Smartcrop
 {
     public $defaultOptions = [
         'width'                   => 0,
@@ -76,7 +76,7 @@ class smartcrop
      * Convert a image to gd resource
      *
      * @param string $image
-     * @return smartcrop
+     * @return Smartcrop
      */
     public function canvasImageOpen($image)
     {
@@ -95,7 +95,7 @@ class smartcrop
     /**
      * Scale the image before smartcrop analyse
      *
-     * @return smartcrop
+     * @return Smartcrop
      */
     public function canvasImageScale()
     {
@@ -137,7 +137,7 @@ class smartcrop
      *
      * @param integer $width
      * @param integer $height
-     * @return smartcrop
+     * @return Smartcrop
      */
     public function canvasImageResample($width, $height)
     {
@@ -516,7 +516,7 @@ class smartcrop
      * @param integer $y
      * @param integer $width
      * @param integer $height
-     * @return smartcrop
+     * @return Smartcrop
      */
     public function crop($x, $y, $width, $height)
     {
