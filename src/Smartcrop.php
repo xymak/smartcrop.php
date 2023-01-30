@@ -148,7 +148,7 @@ class Smartcrop
 
         imagegammacorrect($this->oImg, 2.2, 1);
         imagecopyresampled($oCanvas, $this->oImg, 0, 0, 0, 0, $width, $height, imagesx($this->oImg), imagesy($this->oImg));
-        imagegammacorrect($this->oImg, 1, 2.2);
+        imagegammacorrect($oCanvas, 1, 2.2);
         $this->oImg = $oCanvas;
         return $this;
     }
@@ -414,7 +414,7 @@ class Smartcrop
      */
     function thirds($x)
     {
-        $x = (($x - (1 / 3) + 1.0) % 2.0 * 0.5 - 0.5) * 16;
+        $x = (fmod($x - (1 / 3) + 1.0, 2.0) * 0.5 - 0.5) * 16;
         return max(1.0 - $x * $x, 0.0);
     }
 
@@ -527,7 +527,7 @@ class Smartcrop
 
         imagegammacorrect($this->oImg, 2.2, 1);
         imagecopyresampled($oCanvas, $this->oImg, 0, 0, $x, $y, $width, $height, $width, $height);
-        imagegammacorrect($this->oImg, 1, 2.2);
+        imagegammacorrect($oCanvas, 1, 2.2);
         $this->oImg = $oCanvas;
         return $this;
     }
