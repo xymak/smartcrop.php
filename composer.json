@@ -1,5 +1,11 @@
 {
     "name": "nickdekh/smartcrop.php",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Nickdekh\\SmartcropPhp\\": "src/"
+        }
+    },
     "minimum-stability": "dev",
     "require": {}
 }
